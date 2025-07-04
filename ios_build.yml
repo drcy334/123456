@@ -1,0 +1,46 @@
+
+name: Build iOS App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build React Native project
+        run: npm run build
+
+      - name: Build IPA
+        run: |
+          xcodebuild \
+            -workspace ios/AI_Girlfriend.xcworkspace \
+            -scheme AI_Girlfriend \
+            -configuration Release \
+            -archivePath ${{ github.workspace }}/build/AI_Girlfriend.xcarchive \
+            archive
+
+          xcodebuild \
+            -exportArchive \
+            -archivePath ${{ github.workspace }}/build/AI_Girlfriend.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath ${{ github.workspace }}/build
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: ai-girlfriend-app
+          path: build/*.ipa
