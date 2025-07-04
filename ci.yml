@@ -1,0 +1,11 @@
+name: Build IPA
+on: [push]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install deps
+        run: npm install
+      - name: Build
+        run: echo 'Build your IPA here'
